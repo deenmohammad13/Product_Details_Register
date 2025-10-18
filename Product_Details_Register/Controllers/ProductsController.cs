@@ -152,6 +152,31 @@ namespace Product_Details_Register.Controllers
             //return NotFound();
             return await GetProductByIdAsync(id);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProductAsync (int id)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    string sql = "DELETE FROM Products WHERE Id = @Id;";
+                    int count = await connection.ExecuteAsync(sql, new { Id = id });
+                    if (count < 1)
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("We have an exception: \n" + ex.Message);
+                return BadRequest();
+            }
+            return Ok();
+        }
     }
 
 }
