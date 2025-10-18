@@ -41,7 +41,7 @@ namespace Product_Details_Register.Controllers
                     };
 
                     var newProduct = await connection.QuerySingleOrDefaultAsync<Product>(sql, product);
-                    
+
                     if (newProduct != null)
                     {
                         return Ok(newProduct);
@@ -51,11 +51,11 @@ namespace Product_Details_Register.Controllers
             catch (Exception ex)
             {
 
-                Console.WriteLine("We have an exception: \n"+ ex.Message);
+                Console.WriteLine("We have an exception: \n" + ex.Message);
             }
-            
+
             return BadRequest();
-            
+
         }
 
 
@@ -75,7 +75,7 @@ namespace Product_Details_Register.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("We have an exception: \n"+ ex.Message);
+                Console.WriteLine("We have an exception: \n" + ex.Message);
                 return BadRequest();
             }
             return Ok(products);
@@ -105,5 +105,53 @@ namespace Product_Details_Register.Controllers
             }
             return NotFound();
         }
+
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateproductAsync (int id, ProductDTO productDTO)
+        {
+            try
+            {
+                using(var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    string sql = @"
+                                   UPDATE Products 
+                                   SET Name = @Name, Brand = @Brand, Category = @Category, Price = @Price, Description = @Description
+                                   WHERE Id = @Id;
+                                  ";
+
+                    var product = new Product()
+                    { 
+                        Id = id,
+                        Name = productDTO.Name,
+                        Brand = productDTO.Brand,
+                        Category = productDTO.Category,
+                        Price = productDTO.Price,
+                        Description = productDTO.Description
+                    };
+                    //var updatedProduct = await connection.QuerySingleOrDefaultAsync<Product>(sql, product);
+                    //if (  updatedProduct != null)
+                    //{
+                    //    return Ok ( updatedProduct);
+                    //}
+
+                    int count = await connection.ExecuteAsync(sql, product);
+                    if (count < 1)
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("We have an exception: \n" + ex.Message);
+                return BadRequest();
+            }
+            //return NotFound();
+            return await GetProductByIdAsync(id);
+        }
     }
+
 }
