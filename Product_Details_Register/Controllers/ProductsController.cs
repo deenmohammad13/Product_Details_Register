@@ -51,11 +51,34 @@ namespace Product_Details_Register.Controllers
             catch (Exception ex)
             {
 
-                Console.WriteLine("We have an exception: \n", ex);
+                Console.WriteLine("We have an exception: \n"+ ex.Message);
             }
             
             return BadRequest();
             
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductsAsync()
+        {
+            List<Product> products = new List<Product>();
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    string sql = "SELECT * FROM Products;";
+                    var data = await connection.QueryAsync<Product>(sql);
+                    products = data.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("We have an exception: \n"+ ex.Message);
+                return BadRequest();
+            }
+            return Ok(products);
         }
     }
 }
