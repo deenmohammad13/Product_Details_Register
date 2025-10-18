@@ -80,5 +80,30 @@ namespace Product_Details_Register.Controllers
             }
             return Ok(products);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductByIdAsync(int id)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    string sql = "SELECT * FROM Products WHERE Id = @Id;";
+                    var product = await connection.QuerySingleOrDefaultAsync<Product>(sql, new { Id = id });
+                    if (product != null)
+                    {
+                        return Ok(product);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("We have an exception: \n" + ex.Message);
+                return BadRequest();
+            }
+            return NotFound();
+        }
     }
 }
